@@ -1,0 +1,56 @@
+## Compiled source ##
+bin/
+obj/
+
+## NuGet Packages ##
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+
+## Visual Studio ##
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+## Rider ##
+.idea/
+*.sln.iml
+
+## Visual Studio Code ##
+.vscode/
+
+## Build results ##
+*.exe
+*.dll
+*.pdb
+*.log
+*.cache
+
+## Test results ##
+TestResults/
+*.trx
+
+## Web stuff ##
+wwwroot/lib/
+node_modules/
+bower_components/
+dist/
+build/
+
+## Temporary files ##
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+## OS generated ##
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+## Logs ##
+*.log
