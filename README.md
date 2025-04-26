@@ -45,31 +45,41 @@ DELETE | /api/profile/{profileName} | Delete a profile
 ---
 
 ## 🧠 About the BackgroundService
-The background service (ProfileBackgroundService) runs every 5 minutes and updates the CanEdit parameter of each registered profile by toggling its value between true and false.
 
-Key logs:
+The `ProfileBackgroundService` is responsible for periodically updating profile parameters without user intervention.
 
-BackgroundService start
+- Runs **every 5 minutes**.
+- Toggles the `CanEdit` parameter between `"true"` and `"false"`.
+- Logs the start, each profile update, and completion of each cycle.
+- Uses `IServiceScopeFactory` to resolve services inside the background task safely.
 
-Each parameter update
+**Summary**: It simulates a real-time update environment for profile data by automatically modifying profile attributes over time.
 
-End of each update cycle
+---
 
-📝 Example Log Output
-plaintext
-Copiar
-Editar
+## 📝 Example Log Output
+
+```plaintext
 info: ProfileBackgroundService[0]
       ProfileBackgroundService started.
 info: ProfileBackgroundService[0]
       Profile Admin: CanEdit changed to False.
 info: ProfileBackgroundService[0]
+      Profile User: CanEdit changed to True.
+info: ProfileBackgroundService[0]
       ProfileBackgroundService completed update at 2025-04-26T14:23:45.234Z
+```
 
 ---
 
+### 🔥 Future Improvements
+
+```markdown
 ## 🔥 Future Improvements
-- Persist profiles in a database
-- Implement authentication and authorization for API endpoints
-- Allow configuring the BackgroundService update interval
-- Add unit and integration tests
+
+- 💾 **Persistence**: Store profiles in a database (e.g., SQL Server, MongoDB).
+- 🔐 **Security**: Add authentication and authorization to protect endpoints.
+- 🛠️ **Configuration**: Make the update interval configurable via `appsettings.json`.
+- 🧪 **Testing**: Add unit tests and integration tests for services and controllers.
+- 📈 **Metrics**: Integrate monitoring for BackgroundService execution.
+- 🌐 **Docker Support**: Create a Dockerfile to containerize the application.
