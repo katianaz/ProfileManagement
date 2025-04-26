@@ -1,0 +1,6 @@
+@ProfileManagementApi_HostAddress = http://localhost:5281
+
+GET {{ProfileManagementApi_HostAddress}}/
+Accept: application/json
+
+###
