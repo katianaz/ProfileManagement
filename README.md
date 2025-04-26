@@ -72,9 +72,6 @@ info: ProfileBackgroundService[0]
 
 ---
 
-### 🔥 Future Improvements
-
-```markdown
 ## 🔥 Future Improvements
 
 - 💾 **Persistence**: Store profiles in a database (e.g., SQL Server, MongoDB).
