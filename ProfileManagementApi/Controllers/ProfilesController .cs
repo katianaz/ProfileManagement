@@ -1,4 +1,3 @@
-using CrossCutting.Error;
 using Domain.Services.Interfaces;
 using Domain.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +7,7 @@ namespace ProfileManagementApi.Controllers
 {
     [ApiController]
     [Route("api/profiles")]
-    public class ProfilesController(IProfileService profileService, ErrorContext errorContext) : ControllerBase
+    public class ProfilesController(IProfileService profileService, CrossCutting.Error.ErrorContext errorContext) : ControllerBase
     {
         private readonly IProfileService _profileService = profileService;
 
@@ -69,18 +68,16 @@ namespace ProfileManagementApi.Controllers
         [SwaggerOperation(Summary = "Update the parameters of an existing profile.")]
         [ProducesResponseType(typeof(ProfileResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Update([FromRoute] string profileName, [FromBody] ProfileRequestDto request)
+        public IActionResult Update([FromRoute] string profileName, [FromBody] UpdateProfileRequestDto request)
         {
-            var response = _profileService.Get(profileName);
-
-            _profileService.Update(profileName, request);
+            var result = _profileService.Update(profileName, request);
 
             if (errorContext.HasError)
             {
                 return StatusCode(errorContext.StatusCode, errorContext.Message);
             }
 
-            return Ok(response);
+            return Ok(result);
         }
 
         [HttpDelete("{profileName}")]
@@ -102,9 +99,13 @@ namespace ProfileManagementApi.Controllers
         [SwaggerOperation(Summary = "Validate if a profile has permission for a specific action.")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult ValidatePermission([FromRoute] string profileName, [FromBody] string action)
+        public IActionResult ValidatePermission([FromRoute] string profileName, string action)
         {
             var isValid = _profileService.ValidatePermission(profileName, action);
+            if (errorContext.HasError)
+            {
+                return StatusCode(errorContext.StatusCode, errorContext.Message);
+            }
 
             return Ok(new
             {

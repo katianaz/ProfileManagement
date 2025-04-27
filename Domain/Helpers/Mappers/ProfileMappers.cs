@@ -21,5 +21,13 @@ namespace Domain.Helpers.Mappers
                 Parameters = request.Parameters
             };
         }
+
+        public static ProfileParameter ToModel(this UpdateProfileRequestDto request)
+        {
+            return new ProfileParameter
+            {
+                Parameters = request.Parameters
+            };
+        }
     }
 }

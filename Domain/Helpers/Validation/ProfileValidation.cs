@@ -28,5 +28,33 @@ namespace Domain.Helpers.Validation
 
             return true;
         }
+
+        public bool ValidateIfProfileExists(ProfileParameter profile)
+        {
+            if (profile == null)
+            {
+                errorContext.Add(ErrorType.ProfileNotFound);
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool ValidateIfActionExists(ProfileParameter profile, string action)
+        {
+            if (profile == null)
+            {
+                errorContext.Add(ErrorType.ProfileNotFound);
+                return false;
+            }
+
+            if (profile.Parameters == null || !profile.Parameters.ContainsKey(action))
+            {
+                errorContext.Add(ErrorType.ActionNotFoundForProfile);
+                return false;
+            }
+
+            return true;
+        }
     }
 }

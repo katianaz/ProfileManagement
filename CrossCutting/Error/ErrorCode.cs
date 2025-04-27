@@ -9,6 +9,7 @@ public static class ErrorCode
         switch (errorType)
         {
             case ErrorType.ProfileNotFound:
+            case ErrorType.ActionNotFoundForProfile:
                 return StatusCodes.Status404NotFound;
 
             case ErrorType.InvalidProfileName:

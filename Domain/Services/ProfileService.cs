@@ -1,8 +1,10 @@
 ﻿using Domain.Helpers.Mappers;
+using Domain.Helpers.Validation;
 using Domain.Helpers.Validation.Interfaces;
 using Domain.Services.Interfaces;
 using Domain.ViewModels;
 using Repository.Entities;
+using Repository.Repositories;
 using Repository.Repositories.Interfaces;
 
 namespace Domain.Services
@@ -17,6 +19,12 @@ namespace Domain.Services
         public ProfileResponseDto Get(string profileName)
         {
             if (!profileValidation.ValidateIfProfileNameExists(profileName))
+            {
+                return null;
+            }
+
+            var existingProfile = profileRepository.Get(profileName);
+            if (!profileValidation.ValidateIfProfileExists(existingProfile))
             {
                 return null;
             }
@@ -47,20 +55,20 @@ namespace Domain.Services
             return response;
         }
 
-        public ProfileResponseDto Update(string profileName, ProfileRequestDto request)
+        public ProfileResponseDto Update(string profileName, UpdateProfileRequestDto request)
         {
             if (!profileValidation.ValidateIfProfileNameExists(profileName))
             {
                 return null;
             }
 
-            if (!profileValidation.ValidateIfProfilesIsValid(request))
+            var existingProfile = profileRepository.Get(profileName);
+            if (!profileValidation.ValidateIfProfileExists(existingProfile))
             {
                 return null;
             }
 
             var parameters = request.ToModel();
-
             var result = profileRepository.Update(profileName, parameters);
             var response = result.ToResponseDto();
 
@@ -74,20 +82,30 @@ namespace Domain.Services
                 return;
             }
 
+            var existingProfile = profileRepository.Get(profileName);
+            if (!profileValidation.ValidateIfProfileExists(existingProfile))
+            {
+                return;
+            }
+
             profileRepository.Delete(profileName);
         }
 
-        public bool ValidatePermission(string profileName, string action)
+        public bool? ValidatePermission(string profileName, string action)
         {
             if (!profileValidation.ValidateIfProfileNameExists(profileName))
             {
-                return false;
+                return null;
             }
 
             var profile = profileRepository.Get(profileName);
-            if (profile == null) return false;
 
-            return profile.Parameters.TryGetValue(action, out var value) && value == "true";
+            if (!profileValidation.ValidateIfActionExists(profile, action))
+            {
+                return null;
+            }
+
+            return profile.Parameters[action].Equals("true", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

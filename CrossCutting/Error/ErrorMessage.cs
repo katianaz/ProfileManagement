@@ -7,9 +7,11 @@ public static class ErrorMessage
         switch (errorType)
         {
             case ErrorType.InvalidProfileName:
-                return "Invalid user ProfileName.";
+                return "Invalid profile name.";
+            case ErrorType.ActionNotFoundForProfile:
+                return "Action for profile not found.";
             case ErrorType.ProfileNotFound:
-                return "ProfileName not found.";
+                return "Profile not found.";
             default:
                 return "An error occurred. Please try again.";
         }

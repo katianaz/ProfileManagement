@@ -32,9 +32,8 @@ namespace Domain.Services
                             _logger.LogInformation("Profile {ProfileName}: CanEdit changed to {NewValue}.", profile.Key, (!currentValue).ToString());
                         }
 
-                        var profileRequest = new ProfileRequestDto
+                        var profileRequest = new UpdateProfileRequestDto
                         {
-                            ProfileName = profile.Key,
                             Parameters = profile.Value.Parameters
                         };
 
