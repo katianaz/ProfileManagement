@@ -54,7 +54,6 @@ The `ProfileBackgroundService` is responsible for periodically updating profile 
 - Runs **every 5 minutes**.
 - Toggles the `CanEdit` parameter between `"true"` and `"false"`.
 - Logs the start, each profile update, and completion of each cycle.
-- Uses `IServiceScopeFactory` to resolve services inside the background task safely.
 
 **Summary**: It simulates a real-time update environment for profile data by automatically modifying profile attributes over time.
 
