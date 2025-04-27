@@ -1,10 +1,8 @@
 ﻿using Domain.Helpers.Mappers;
-using Domain.Helpers.Validation;
 using Domain.Helpers.Validation.Interfaces;
 using Domain.Services.Interfaces;
 using Domain.ViewModels;
 using Repository.Entities;
-using Repository.Repositories;
 using Repository.Repositories.Interfaces;
 
 namespace Domain.Services
