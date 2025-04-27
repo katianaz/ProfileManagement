@@ -1,56 +1,93 @@
-﻿using Domain.Services.Interfaces;
+﻿using Domain.Helpers.Mappers;
+using Domain.Helpers.Validation.Interfaces;
+using Domain.Services.Interfaces;
+using Domain.ViewModels;
 using Repository.Entities;
 using Repository.Repositories.Interfaces;
 
 namespace Domain.Services
 {
-    public class ProfileService(IProfileRepository profileRepository) : IProfileService
+    public class ProfileService(IProfileRepository profileRepository, IProfileValidation profileValidation) : IProfileService
     {
-        private readonly IProfileRepository _profileRepository = profileRepository;
-
         public Dictionary<string, ProfileParameter> GetAllProfiles()
         {
-            return _profileRepository.GetAll();
+            return profileRepository.GetAll();
         }
 
-        public ProfileParameter? Get(string profileName)
+        public ProfileResponseDto Get(string profileName)
         {
-            return _profileRepository.Get(profileName);
+            if (!profileValidation.ValidateIfProfileNameExists(profileName))
+            {
+                return null;
+            }
+
+            var result = profileRepository.Get(profileName);
+            var response = result.ToResponseDto();
+
+            return response;
         }
 
-        public void Add(string profileName, ProfileParameter parameters)
+        public ProfileResponseDto Add(string profileName, ProfileRequestDto request)
         {
-            _profileRepository.Add(profileName, parameters);
+            if (!profileValidation.ValidateIfProfileNameExists(profileName))
+            {
+                return null;
+            }
+
+            if (!profileValidation.ValidateIfProfilesIsValid(request))
+            {
+                return null;
+            }
+
+            var parameters = request.ToModel();
+
+            var result = profileRepository.Add(profileName, parameters);
+            var response = result.ToResponseDto();
+
+            return response;
         }
 
-        public void Update(string profileName, Dictionary<string, string> parameters)
+        public ProfileResponseDto Update(string profileName, ProfileRequestDto request)
         {
-            _profileRepository.Update(profileName, parameters);
+            if (!profileValidation.ValidateIfProfileNameExists(profileName))
+            {
+                return null;
+            }
+
+            if (!profileValidation.ValidateIfProfilesIsValid(request))
+            {
+                return null;
+            }
+
+            var parameters = request.ToModel();
+
+            var result = profileRepository.Update(profileName, parameters);
+            var response = result.ToResponseDto();
+
+            return response;
         }
 
         public void Delete(string profileName)
         {
-            _profileRepository.Delete(profileName);
+            if (!profileValidation.ValidateIfProfileNameExists(profileName))
+            {
+                return;
+            }
+
+            profileRepository.Delete(profileName);
         }
 
         public bool ValidatePermission(string profileName, string action)
         {
-            var profile = _profileRepository.Get(profileName);
+            if (!profileValidation.ValidateIfProfileNameExists(profileName))
+            {
+                return false;
+            }
+
+            var profile = profileRepository.Get(profileName);
             if (profile == null) return false;
 
             return profile.Parameters.TryGetValue(action, out var value) && value == "true";
-        }
-
-        public void UpdateParametersPeriodically()
-        {
-            var profiles = _profileRepository.GetAll();
-            foreach (var profile in profiles.Values)
-            {
-                foreach (var key in profile.Parameters.Keys.ToList())
-                {
-                    profile.Parameters[key] = profile.Parameters[key] == "true" ? "false" : "true";
-                }
-            }
         }
     }
 }

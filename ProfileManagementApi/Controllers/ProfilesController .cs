@@ -1,14 +1,14 @@
+using CrossCutting.Error;
 using Domain.Services.Interfaces;
 using Domain.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Repository.Entities;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace ProfileManagementApi.Controllers
 {
     [ApiController]
     [Route("api/profiles")]
-    public class ProfilesController(IProfileService profileService) : ControllerBase
+    public class ProfilesController(IProfileService profileService, ErrorContext errorContext) : ControllerBase
     {
         private readonly IProfileService _profileService = profileService;
 
@@ -24,6 +24,11 @@ namespace ProfileManagementApi.Controllers
                     Parameters = p.Value.Parameters
                 });
 
+            if (errorContext.HasError)
+            {
+                return StatusCode(errorContext.StatusCode, errorContext.Message);
+            }
+
             return Ok(profiles);
         }
 
@@ -31,67 +36,65 @@ namespace ProfileManagementApi.Controllers
         [SwaggerOperation(Summary = "Get a specific profile by its name.")]
         [ProducesResponseType(typeof(ProfileResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<ProfileResponseDto> Get(string profileName)
+        public ActionResult<ProfileResponseDto> Get([FromRoute] string profileName)
         {
             var profile = _profileService.Get(profileName);
-            if (profile == null)
-                return NotFound();
 
-            var response = new ProfileResponseDto
+            if (errorContext.HasError)
             {
-                ProfileName = profile.ProfileName,
-                Parameters = profile.Parameters
-            };
+                return StatusCode(errorContext.StatusCode, errorContext.Message);
+            }
 
-            return Ok(response);
+            return Ok(profile);
         }
 
         [HttpPost]
         [SwaggerOperation(Summary = "Create a new profile.")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProfileResponseDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Add([FromBody] ProfileRequestDto request)
         {
-            if (request == null)
-                return BadRequest();
+            var response = _profileService.Add(request.ProfileName, request);
 
-            var newProfile = new ProfileParameter
+            if (errorContext.HasError)
             {
-                ProfileName = request.ProfileName,
-                Parameters = request.Parameters
-            };
+                return StatusCode(errorContext.StatusCode, errorContext.Message);
+            }
 
-            _profileService.Add(request.ProfileName, newProfile);
-
-            return CreatedAtAction(nameof(Get), new { profileName = request.ProfileName }, newProfile);
+            return StatusCode(StatusCodes.Status201Created, response);
         }
 
 
         [HttpPut("{profileName}")]
         [SwaggerOperation(Summary = "Update the parameters of an existing profile.")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProfileResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Update(string profileName, [FromBody] Dictionary<string, string> parameters)
+        public IActionResult Update([FromRoute] string profileName, [FromBody] ProfileRequestDto request)
         {
-            var existing = _profileService.Get(profileName);
-            if (existing == null)
-                return NotFound();
+            var response = _profileService.Get(profileName);
 
-            _profileService.Update(profileName, parameters);
-            return NoContent();
+            _profileService.Update(profileName, request);
+
+            if (errorContext.HasError)
+            {
+                return StatusCode(errorContext.StatusCode, errorContext.Message);
+            }
+
+            return Ok(response);
         }
 
         [HttpDelete("{profileName}")]
         [SwaggerOperation(Summary = "Delete a profile.")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Delete(string profileName)
+        public IActionResult Delete([FromRoute] string profileName)
         {
-            var existing = _profileService.Get(profileName);
-            if (existing == null)
-                return NotFound();
-
             _profileService.Delete(profileName);
+            if (errorContext.HasError)
+            {
+                return StatusCode(errorContext.StatusCode, errorContext.Message);
+            }
+
             return NoContent();
         }
 
@@ -99,7 +102,7 @@ namespace ProfileManagementApi.Controllers
         [SwaggerOperation(Summary = "Validate if a profile has permission for a specific action.")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult ValidatePermission(string profileName, [FromQuery] string action)
+        public IActionResult ValidatePermission([FromRoute] string profileName, [FromBody] string action)
         {
             var isValid = _profileService.ValidatePermission(profileName, action);
 

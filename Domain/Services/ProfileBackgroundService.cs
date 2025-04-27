@@ -1,4 +1,5 @@
 ﻿using Domain.Services.Interfaces;
+using Domain.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -31,7 +32,13 @@ namespace Domain.Services
                             _logger.LogInformation("Profile {ProfileName}: CanEdit changed to {NewValue}.", profile.Key, (!currentValue).ToString());
                         }
 
-                        profileService.Update(profile.Key, profile.Value.Parameters);
+                        var profileRequest = new ProfileRequestDto
+                        {
+                            ProfileName = profile.Key,
+                            Parameters = profile.Value.Parameters
+                        };
+
+                        profileService.Update(profile.Key, profileRequest);
                     }
                 }
 

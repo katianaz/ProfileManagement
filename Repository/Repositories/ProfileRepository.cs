@@ -39,17 +39,15 @@ namespace Repository.Repositories
             return _profileDictionary.GetValueOrDefault(profileName);
         }
 
-        public void Add(string profileName, ProfileParameter profileParameter)
+        public ProfileParameter Add(string profileName, ProfileParameter profileParameter)
         {
-            _profileDictionary[profileName] = profileParameter;
+            return _profileDictionary[profileName] = profileParameter;
         }
 
-        public void Update(string profileName, Dictionary<string, string> parameters)
+        public ProfileParameter Update(string profileName, ProfileParameter profileParameter)
         {
-            if (_profileDictionary.TryGetValue(profileName, out ProfileParameter value))
-            {
-                value.Parameters = parameters;
-            }
+            _profileDictionary[profileName].Parameters = profileParameter.Parameters;
+            return _profileDictionary[profileName];
         }
 
         public void Delete(string profileName)
