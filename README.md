@@ -34,13 +34,16 @@ An API for managing profiles and their parameters, with automatic updates every 
    
 ---
 
-## 📚 Endpoints
-Method | Route | Description
-GET | /api/profile | Get all profiles
-GET | /api/profile/{profileName} | Get a profile by name
-POST | /api/profile | Create a new profile
-PUT | /api/profile/{profileName} | Update profile parameters
-DELETE | /api/profile/{profileName} | Delete a profile
+# 📚 Endpoints
+
+| Method | Route | Description |
+|:------:|:-----:|:----------- |
+| **GET** | `/api/profile` | Get all profiles |
+| **GET** | `/api/profile/{profileName}` | Get a profile by name |
+| **POST** | `/api/profile` | Create a new profile |
+| **PUT** | `/api/profile/{profileName}` | Update profile parameters |
+| **DELETE** | `/api/profile/{profileName}` | Delete a profile |
+
 
 ---
 
